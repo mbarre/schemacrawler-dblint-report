@@ -1,0 +1,1 @@
+java -classpath ../../_schemacrawler/lib/*;lib/* schemacrawler.Main -server=hsqldb -database=schemacrawler -user=sa -password= -infolevel=standard -command=dblint -infolevel=maximum -loglevel=INFO -outputformat NoumeaDatabaseLintReportTemplate.thymeleaf -o NoumeaDatabaseLintReport.html
