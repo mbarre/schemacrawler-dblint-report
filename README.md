@@ -5,7 +5,7 @@ Custom database lint report, using Thymeleaf, for the Ville de Nouméa
 >> Please do not clone this project - just transfer ownership to yourselves.
 
 # Testing Instructions
-- Dowload SchemaCrawler examples, from the SchemaCrawler relase download
+- Download SchemaCrawler examples, from the SchemaCrawler relase download
 - Go to the Thymeleaf example, and follow intructions
 - Complete running the standard Thymeleaf example, and do not shut down the database server
 - Build this project using Maven 3.0
