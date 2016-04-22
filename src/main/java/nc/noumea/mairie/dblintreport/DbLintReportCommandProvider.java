@@ -6,13 +6,11 @@ import schemacrawler.tools.executable.CommandProvider;
 import schemacrawler.tools.executable.Executable;
 import schemacrawler.tools.options.OutputOptions;
 
-public class DbLintReportCommandProvider
-  implements CommandProvider
+public class DbLintReportCommandProvider implements CommandProvider
 {
 
   @Override
-  public Executable configureNewExecutable(final SchemaCrawlerOptions schemaCrawlerOptions,
-                                           final OutputOptions outputOptions)
+  public Executable configureNewExecutable(final SchemaCrawlerOptions schemaCrawlerOptions, final OutputOptions outputOptions)
   {
     final DbLintReportExecutable executable = new DbLintReportExecutable();
     if (schemaCrawlerOptions != null)

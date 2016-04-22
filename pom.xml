@@ -5,6 +5,13 @@
   <artifactId>schemacrawler-dblint-report</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>Nouméa Database Lint Report</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <schemacrawler.version>14.07.08</schemacrawler.version>
+    <maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -22,18 +29,20 @@
       <groupId>us.fatehi</groupId>
       <artifactId>schemacrawler-lint</artifactId>
       <version>${schemacrawler.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.thymeleaf</groupId>
       <artifactId>thymeleaf</artifactId>
       <version>2.1.4.RELEASE</version>
-      <scope>provided</scope>
-    </dependency>    
+    </dependency>
+    <dependency>
+      <groupId>org.javassist</groupId>
+      <artifactId>javassist</artifactId>
+      <version>3.20.0-GA</version>
+    </dependency>
   </dependencies>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <schemacrawler.version>14.07.08</schemacrawler.version>
-  </properties>
+
   <build>
     <plugins>
       <plugin>
@@ -44,6 +53,22 @@
           <source>8</source>
           <target>8</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>${maven-shade-plugin.version}</version>
+        <configuration>
+          <!-- put your configurations here -->
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
