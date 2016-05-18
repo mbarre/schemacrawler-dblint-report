@@ -1,0 +1,130 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+  <head>
+    <title>Nouméa Database Lint Dashboard</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+          .arc text {
+            font: 10px sans-serif;
+            text-anchor: middle;
+          }
+
+          .arc path {
+            stroke: #fff;
+          }
+
+          .jq-stars {
+              display: inline-block;
+          }
+
+          .jq-rating-label {
+              font-size: 22px;
+              display: inline-block;
+              position: relative;
+              vertical-align: top;
+              font-family: helvetica, arial, verdana;
+          }
+
+          .jq-star {
+              width: 100px;
+              height: 100px;
+              display: inline-block;
+              cursor: pointer;
+          }
+
+          .jq-star-svg {
+              width: 100%;
+              height: 100% ;
+          }
+
+          .jq-star:hover .fs-star-svg polygon {
+          }
+
+          .jq-star-svg polygon {
+              stroke: #000;
+              stroke-linejoin: round;
+          }
+    </style>
+  </head>
+
+  <body>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://raw.githubusercontent.com/nashio/star-rating-svg/master/dist/jquery.star-rating-svg.min.js"></script>
+    <script th:inline="javascript">
+    /*<![CDATA[*/
+          var width = 960,
+              height = 500,
+              radius = Math.min(width, height) / 2;
+
+          var color = d3.scale.ordinal()
+              .range(["#8a89a6", "#7b6888", "#a05d56", "#ff8c00"]);
+
+          var arc = d3.svg.arc()
+              .outerRadius(radius - 10)
+              .innerRadius(radius - 70);
+
+          var pie = d3.layout.pie()
+              .sort(null)
+              .value(function(d) { return d.hit; });
+
+          var svg = d3.select("body").append("svg")
+              .attr("width", width)
+              .attr("height", height)
+            .append("g")
+              .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+
+           /*[+
+           var data = [{'severity': 'Critical', hit: [[${lintResult.nbCriticalHit}]]}, {'severity': 'High', hit: [[${lintResult.nbHighHit}]]}, {'severity': 'Medium', hit: [[${lintResult.nbMediumHit}]]}, {'severity': 'Low', hit: [[${lintResult.nbLowHit}]]}];
+           +]*/
+
+            var g = svg.selectAll(".arc")
+                .data(pie(data))
+              .enter().append("g")
+                .attr("class", "arc");
+
+            g.append("path")
+                .attr("d", arc)
+                .style("fill", function(d) { return color(d.data.severity); });
+
+            g.append("text")
+                .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+                .attr("dy", ".35em")
+                .text(function(d) { return d.data.severity; });
+
+
+
+           $(function() {
+
+                     $(".myDb-rating-5").starRating({
+                       totalStars: 4,
+                        emptyColor: 'lightgray',
+                        activeColor: 'cornflowerblue',
+                        initialRating: [[${lintResult.globalScore}]],
+                        readOnly: true
+                     });
+                   });
+           /*]]>*/
+     </script>
+     <script th:inline="javascript">
+
+
+
+
+
+     </script>
+
+
+    <div class="container">
+
+        <div class="myDb-rating-5"></div>
+
+    </div>
+
+  </body>
+
+</html>

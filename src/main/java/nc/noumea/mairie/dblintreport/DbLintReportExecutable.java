@@ -7,6 +7,7 @@ import org.thymeleaf.templateresolver.*;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.SchemaCrawlerException;
 import schemacrawler.tools.executable.BaseStagedExecutable;
+import schemacrawler.tools.lint.Lint;
 import schemacrawler.tools.lint.LintedCatalog;
 import schemacrawler.tools.lint.LinterConfigs;
 import schemacrawler.tools.lint.Linters;
@@ -21,8 +22,11 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static java.nio.file.Files.*;
+import static schemacrawler.tools.lint.LintSeverity.*;
 import static sf.util.Utility.isBlank;
 
 public class DbLintReportExecutable extends BaseStagedExecutable
@@ -57,9 +61,14 @@ public class DbLintReportExecutable extends BaseStagedExecutable
 
   private void generateReport(final LintedCatalog lintedCatalog) throws IOException
   {
-    final Context ctx = new Context();
-    ctx.setVariable("catalog", lintedCatalog);
 
+    DbLintResult lintResult = generateLintsResult(lintedCatalog);
+    System.out.println("---"+lintedCatalog.getCollector().size());
+
+    final Context ctx = new Context();
+    ctx.setVariable("lintResult", lintResult);
+
+    LOGGER.log(Level.INFO, "Start generate report");
     final TemplateEngine templateEngine = new TemplateEngine();
     final Charset inputCharset = outputOptions.getInputCharset();
 
@@ -73,6 +82,8 @@ public class DbLintReportExecutable extends BaseStagedExecutable
     {
       templateEngine.process(templateLocation, ctx, writer);
     }
+    LOGGER.log(Level.INFO, "End generate report");
+
   }
 
   private ITemplateResolver configure(final TemplateResolver templateResolver, final Charset inputEncoding)
@@ -119,6 +130,62 @@ public class DbLintReportExecutable extends BaseStagedExecutable
       LOGGER.log(Level.WARNING, "Could not load linter configs from file, " + linterConfigsFile, e);
       return linterConfigs;
     }
+  }
+
+  DbLintResult generateLintsResult(LintedCatalog lintedCatalog){
+    LOGGER.log(Level.INFO, "Start generateLintsResult");
+    if (lintedCatalog == null) {
+      LOGGER.log(Level.INFO, "lintedCatalog = null");
+      return null;
+    }
+
+    DbLintResult result = new DbLintResult();
+
+    Stream<Lint<?>> lints = StreamSupport.stream(lintedCatalog.getCollector().spliterator(),  false);
+
+    // Count critical hits
+    Stream<Lint<?>> hits = lints.filter(l -> l.getSeverity() == critical);
+    result.setNbCriticalHit(((Long)hits.count()).intValue());
+
+    // Count high hits
+    lints = StreamSupport.stream(lintedCatalog.getCollector().spliterator(),  false);
+    hits = lints.filter(l -> l.getSeverity() == high);
+    result.setNbHighHit(((Long)hits.count()).intValue());
+
+    // Count medium hits
+    lints = StreamSupport.stream(lintedCatalog.getCollector().spliterator(),  false);
+    hits = lints.filter(l -> l.getSeverity() == medium);
+    result.setNbMediumHit(((Long)hits.count()).intValue());
+
+    // Count low hits
+    lints = StreamSupport.stream(lintedCatalog.getCollector().spliterator(),  false);
+    hits = lints.filter(l -> l.getSeverity() == low);
+    result.setNbLowHit(((Long)hits.count()).intValue());
+
+    result.setJsonStringHits("[{'Severity': 'Critical', Hit: "+result.getNbCriticalHit()+"}, " +
+            "{'Severity': 'High', Hit: "+result.getNbHighHit()+"}," +
+            "{'Severity': 'Medium', Hit: "+result.getNbMediumHit()+"}" +
+            "{'Severity': 'Low', Hit: "+result.getNbLowHit()+"}]");
+
+    if(result.getNbCriticalHit() > 0){
+      result.setGlobalScore(0);
+    }
+    else if(result.getNbHighHit() > 0){
+      result.setGlobalScore(1);
+    }
+    else if(result.getNbMediumHit() > 0){
+      result.setGlobalScore(2);
+    }
+    else if(result.getNbLowHit() > 0) {
+      result.setGlobalScore(3);
+    }
+    else{
+      result.setGlobalScore(4);
+    }
+
+    LOGGER.log(Level.INFO, "End generateLintsResult");
+    return result;
+
   }
 
 }
