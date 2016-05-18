@@ -12,3 +12,9 @@ Custom database lint report, using Thymeleaf, for the Ville de Nouméa
 - Copy the jar built by this project into the `examples/_schemacrawler/lib` folder
 - Copy the additional resources (from `schemacrawler-dblint-report/src/additional-resources') into the Thymeleaf examples directory
 - Run the starter template for the Ville de Nouméa Custom Database Lint Report 
+ 
+# Sources of inspration
+
+- http://www.creative-tim.com/product/light-bootstrap-dashboard?ref=presentation-page
+- http://demos.creative-tim.com/light-bootstrap-dashboard/dashboard
+
